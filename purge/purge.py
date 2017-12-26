@@ -7,8 +7,7 @@ import argparse
 
 def main():
     args = getArgs()
-    src = args.root
-    directories = os.listdir(src)
+    directories = os.listdir(args.root)
     print(directories)
     directories = getRelevantDirectories(directories)
 
@@ -20,7 +19,7 @@ def getArgs():
     return args
 
 def getRelevantDirectories(directories):
-    relevantDirectories = ["Desktop", "Document", "Downloads"]
+    relevantDirectories = ["Desktop", "Document", "Downloads", ".Trash"]
 
 
 if __name__ == "__main__":
