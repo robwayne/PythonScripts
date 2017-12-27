@@ -1,26 +1,119 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.5
 
 import os
-import shutil
 import argparse
 import subprocess
+import sys
 
+def getArgs():
+    parse = argparse.ArgumentParser()
+    parse.add_argument("-p","--path",help="The path to the root directory of the tree to rename the files and folders from")
+    parse.add_argument("-v","--verbose", help="Forces the script to print its current activity",action="count", default=0)
+    args = parse.parse_args()
+    return args
+
+relevantFolders = ["Desktop","Downloads", ".Trash"]
+args = getArgs()
+successfulRemovals = {}
+failedRemovals = {}
 
 def main():
-    args = getArgs()
-    directories = os.listdir(args.root)
-    print(directories)
-    directories = getRelevantDirectories(directories)
+    pathProvided = False
+
+    if args.path:
+        if(args.verbose >= 2):
+            subprocess.call(["markForRemoval.py", "-v", "-p", path['root']])
+        else:
+            subprocess.call(["markForRemoval.py", "-p", path['root']])
+    elif args.path is None:
+        if(args.verbose >= 2):
+            subprocess.call(["markForRemoval.py", "-v"])
+        else:
+            subprocess.call(["markForRemoval.py"])
+
+    if args.verbose >= 2:
+        resume = input("Do you want to continue with purge and remove these items? ['yes' | 'no'] ").lower()
+
+        if resume[0] == 'y':
+            print("Items will be removed.")
+            if pathProvided:
+                remove(root=args.path)
+            else:
+                remove()
+        else:
+            print("Removal cancelled. Execution of purge stopped.")
+    else:
+        if pathProvided:
+            remove(root=args.path)
+        else:
+            remove()
+
+
+
+def remove(**path):
+    topLevelDir = os.getcwd()
+
+    if 'root' in path:
+        currentDir = path['root']
+        walkTree(currentDir)
+    else:
+        for folder in relevantFolders:
+            currentDir = os.path.join(topLevelDir,folder)
+            os.chdir(currentDir)
+            walkTree(currentDir)
+
+
+def walkTree(directoryPath):
+
+    script = sys.argv[0]
+    if script.startswith("./"):
+        script = script[2:]
+
+    for dpath, dirs, files in os.walk(directoryPath,topdown=False):
+        os.chdir(dpath)
+        for filename in files:
+            if filename.startswith("delete_") and filename != script:
+                if args.verbose >= 1:
+                    print("removing: ",filename)
+                try:
+                    os.remove(filename)
+                    successfulRemovals[filename] = dpath
+                except OSError as e:
+                    failedRemovals[filename] = dpath
+                    print("ERROR: {} - {}".format(e.filename,e.strerror))
+
+        for directory in dirs:
+            if directory not in relevantFolders and directory.startswith("delete_"):
+                if args.verbose >= 1:
+                    print("removing: ",directory)
+                try:
+                    os.rmdir(directory)
+                    successfulRemovals[directory] = dpath
+                except OSError as e:
+                    failedRemovals[directory] = dpath
+                    print("ERROR: {} - {}".format(e.filename,e.strerror))
+
+    if args.verbose >= 1:
+        totalItems = len(successfulRemovals)+len(failedRemovals)
+        print("{} out of {} items were successfully removed.".format(len(successfulRemovals), totalItems))
+        if (len(successfulRemovals)>0):
+            print("Successfully removed:")
+            for key in successfulRemovals:
+                print(key,"in folder: ",successfulRemovals[key])
+        print("{} out of {} items failed during removal.".format(len(failedRemovals), totalItems))
+        if(len(failedRemovals)>0):
+            print("\nFailed while removing:")
+            for key in failedRemovals:
+                print(key,"in folder: ",failedRemovals[key])
+
 
 
 def getArgs():
     parse = argparse.ArgumentParser()
-    parse.add_argument("root",help="the root directory to purge children tree")
+    parse.add_argument("-p","--path",help="The path to the root directory of the tree to rename the files and folders from")
+    parse.add_argument("-v","--verbose", help="Forces the script to print its current activity",action="count", default=0)
     args = parse.parse_args()
     return args
-
-def getRelevantDirectories(directories):
-    relevantDirectories = ["Desktop", "Document", "Downloads", ".Trash"]
 
 
 if __name__ == "__main__":
