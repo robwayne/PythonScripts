@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.5
 
 ''' A script to work in tandem with purge.py. Renames all the files in certain directories to either
         "delete_<file/folder_name>" or "keep_<file_name>" '''
@@ -6,6 +6,15 @@
 import os
 import argparse
 import sys
+
+def getArgs():
+    parse = argparse.ArgumentParser()
+    parse.add_argument("-m", "--method", help="the name of the task to perform: 'mark' to label the items to be deleted or remove the \
+        label that was set previously", choices=["mark","unmark"])
+    parse.add_argument("-p","--path",help="The path to the root directory of the tree to rename the files and folders from")
+    parse.add_argument("-v","--verbose", help="Forces the script to print its current activity",action="store_true")
+    args = parse.parse_args()
+    return args
 
 relevantFolders = ["Desktop","Downloads", ".Trash"]
 allFiles = []
@@ -15,12 +24,9 @@ args = getArgs()
 def main():
     method = args.method
     if method == "mark" or method is None:
-        if args.path is None and 'root' not in kwargs:
+        if args.path is None:
             markForRemoval()
-        else:
-            if 'root' in kwargs:
-                markForRemoval(root=kwargs['root'])
-            elif args.path is not None:
+        elif args.path is not None:
                 markForRemoval(root=args.path)
 
         if(args.verbose):
@@ -30,12 +36,9 @@ def main():
             print("You are about to get rid of {} items. {} folders and {} files.".format(totalItems, len(allFiles),len(allFolders)))
 
     elif method == "unmark":
-        if args.path is None and 'root' not in kwargs:
+        if args.path is None:
             unmark()
-        else:
-            if 'root' in kwargs:
-                unmark(root=kwargs['root'])
-            elif args.path is not None:
+        elif args.path is not None:
                 unmark(root=args.path)
 
 
@@ -114,22 +117,15 @@ def unmark(**path):
                     print("ERROR: {} - {}".format(e.filename,e.strerror))
         for filename in files:
             if filename.startswith("delete_"):
-                try
+                try:
                     os.rename(filename,filename[7:])
                     if (args.verbose):
                         print(filename,"-->",filename[7:])
                 except OSError as e:
                     print("ERROR: {} - {}".format(e.filename,e.strerror))
 
-def getArgs():
-    parse = argparse.ArgumentParser()
-    parse.add_argument("-m", "--method", help="the name of the task to perform: 'mark' to label the items to be deleted or remove the \
-        label that was set previously", choices=["mark","unmark"])
-    parse.add_argument("-p","--path",help="The path to the root directory of the tree to rename the files and folders from")
-    parse.add_argument("-v","--verbose", help="Forces the script to print its current activity",action="store_true")
-    args = parse.parse_args()
-    return args
+
 
 if __name__ == "__main__":
-    print("running as main program")
+    print("running...")
     main()
