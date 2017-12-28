@@ -30,10 +30,12 @@ def main():
                 markForRemoval(root=args.path)
 
         if(args.verbose):
+            print("")
             printItems(allFiles,"Files")
+            print("")
             printItems(allFolders,"Folders")
             totalItems = len(allFiles)+len(allFolders)
-            print("You are about to get rid of {} items. {} folders and {} files.".format(totalItems, len(allFiles),len(allFolders)))
+            print("\nYou are about to get rid of {} item(s). {} file(s) and {} folder(s).".format(totalItems, len(allFiles),len(allFolders)))
 
     elif method == "unmark":
         if args.path is None:
@@ -63,7 +65,6 @@ def walkTree(directoryPath):
 
     for dpath, dirs, files in os.walk(directoryPath, topdown=False):
         os.chdir(dpath)
-        print(dpath+": ")
         for directory in dirs:
             if ( (directory not in relevantFolders) and (not directory.startswith("keep_")) ):
                 if not directory.startswith("delete_"):
@@ -90,12 +91,12 @@ def walkTree(directoryPath):
                         print("ERROR: {} - {}".format(e.filename,e.strerror))
                 elif filename.startswith("delete_"):
                     allFiles.append(filename)
-        print("")
 
 def printItems(items, typeOfItem):
-    print(typeOfItem+" to be deleted: ")
-    for item in items:
-        print(item, end=",\n")
+    if (len(items)>0):
+        print(typeOfItem+" to be deleted: ")
+        for item in items:
+            print(" ",item, end=",\n")
 
 def unmark(**path):
     if 'root' in path:

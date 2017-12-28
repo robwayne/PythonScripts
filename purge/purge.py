@@ -21,10 +21,11 @@ def main():
     pathProvided = False
 
     if args.path:
+        pathProvided = True
         if(args.verbose >= 2):
-            subprocess.call(["markForRemoval.py", "-v", "-p", path['root']])
+            subprocess.call(["markForRemoval.py", "-v", "-p", args.path])
         else:
-            subprocess.call(["markForRemoval.py", "-p", path['root']])
+            subprocess.call(["markForRemoval.py", "-p", args.path])
     elif args.path is None:
         if(args.verbose >= 2):
             subprocess.call(["markForRemoval.py", "-v"])
@@ -32,7 +33,7 @@ def main():
             subprocess.call(["markForRemoval.py"])
 
     if args.verbose >= 2:
-        resume = input("Do you want to continue with purge and remove these items? ['yes' | 'no'] ").lower()
+        resume = input("Do you want to continue with purge and remove these items? ('yes' , 'no'): ").lower()
 
         if resume[0] == 'y':
             print("Items will be removed.")
@@ -127,4 +128,3 @@ def getArgs():
 
 if __name__ == "__main__":
     main()
- 
