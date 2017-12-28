@@ -79,32 +79,41 @@ def walkTree(directoryPath):
                     os.remove(filename)
                     successfulRemovals[filename] = dpath
                 except OSError as e:
-                    failedRemovals[filename] = dpath
+                    failedRemovals[(filename,e.strerror)] = dpath
                     print("ERROR: {} - {}".format(e.filename,e.strerror))
 
         for directory in dirs:
             if directory not in relevantFolders and directory.startswith("delete_"):
                 if args.verbose >= 1:
                     print("removing: ",directory)
-                try:
-                    os.rmdir(directory)
-                    successfulRemovals[directory] = dpath
-                except OSError as e:
-                    failedRemovals[directory] = dpath
-                    print("ERROR: {} - {}".format(e.filename,e.strerror))
+                    if(os.path.islink(directory)):
+                        try:
+                            os.unlink(directory)
+                            successfulRemovals[directory] = dpath
+                        except OSError as e:
+                            failedRemovals[(directory,e.strerror)] = dpath
+                            print("ERROR: {} - {}".format(e.filename,e.strerror))
+                    else:
+                        try:
+                            os.rmdir(directory)
+                            successfulRemovals[directory] = dpath
+                        except OSError as e:
+                            failedRemovals[(directory,e.strerror)] = dpath
+                            print("ERROR: {} - {}".format(e.filename,e.strerror))
 
     if args.verbose >= 1:
         totalItems = len(successfulRemovals)+len(failedRemovals)
-        print("{} out of {} items were successfully removed.".format(len(successfulRemovals), totalItems))
+        print("\n{} out of {} item(s) was(were) successfully removed.".format(len(successfulRemovals), totalItems))
         if (len(successfulRemovals)>0):
-            print("Successfully removed:")
+            print("\nSuccessfully removed:")
             for key in successfulRemovals:
-                print(key,"in folder: ",successfulRemovals[key])
-        print("{} out of {} items failed during removal.".format(len(failedRemovals), totalItems))
+                print(" ",key,"in folder: ",successfulRemovals[key])
+        print("\n{} out of {} items failed during removal.".format(len(failedRemovals), totalItems))
         if(len(failedRemovals)>0):
             print("\nFailed while removing:")
             for key in failedRemovals:
-                print(key,"in folder: ",failedRemovals[key])
+                key1, key2 = key
+                print(" ",key1,"in folder: ",failedRemovals[key], " - ",key2)
 
 
 
@@ -118,3 +127,4 @@ def getArgs():
 
 if __name__ == "__main__":
     main()
+ 
