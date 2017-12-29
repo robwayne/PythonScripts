@@ -45,7 +45,7 @@ def main():
 
 
 def markForRemoval(**path):
-    toplevelDirectory = os.getcwd()
+    toplevelDirectory = os.path.dirname(os.path.realpath(__file__))
 
     if ('root' in path):
         currentDir = path['root']
@@ -102,7 +102,7 @@ def unmark(**path):
     if 'root' in path:
         currentDir = path['root']
     else:
-        currentDir = os.getcwd()
+        currentDir = os.path.dirname(os.path.realpath(__file__))
 
     print(currentDir)
 
