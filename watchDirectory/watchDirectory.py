@@ -1,19 +1,22 @@
-#!/usr/bin/env 3.5
+#!/usr/bin/env python3.5
 
-#inspiration from https://www.michaelcho.me/article/using-pythons-watchdog-to-monitor-changes-to-a-directory
+
 
 import os
 import argparse
-from watchdog.observers import Observe
+import time
+from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+
+#inspiration from https://www.michaelcho.me/article/using-pythons-watchdog-to-monitor-changes-to-a-directory
 
 class Watcher:
     def __init__(self, **kwargs):
-        self.observer = Observe()
+        self.observer = Observer()
         if ('path' in kwargs):
             self.path = os.path.abspath(kwargs['path'])
         else:
-            self.path = obs.path.abspath('.')
+            self.path = os.path.abspath(".")
 
         if 'recursive' in kwargs:
             self.recursive = kwargs[recursive]
@@ -23,24 +26,25 @@ class Watcher:
 
     def run(self):
         eventHandler = Handler()
+        print(self.path)
         self.observer.schedule(eventHandler,self.path,recursive=self.recursive)
         self.observer.start()
         try:
             while True:
-                sleep(5)
-        except:
+                time.sleep(5)
+        except KeyboardInterrupt:
             self.observer.stop()
             print("Error")
         self.observer.join()
 
 
 class Handler(FileSystemEventHandler):
-    def on_created(event):
-        if(event.is_dir):
+    def on_created(self,event):
+        if(event.is_directory):
             print("Folder: ",event.src_path, "was created.")
         else: print("File: ",event.src_path, "was created.")
-    def on_modified(event):
-        if(event.is_dir):
+    def on_modified(self,event):
+        if(event.is_directory):
             print("Folder: ",event.src_path, "was modified.")
         else: print("File: ",event.src_path, "was modified.")
 
@@ -62,5 +66,7 @@ def main():
         watcher = Watcher(recursive=args.recursive)
     else:
         watcher = Watcher()
+    watcher.run()
 
-      
+if __name__ == "__main__":
+    main()
