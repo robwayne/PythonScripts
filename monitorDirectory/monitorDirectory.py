@@ -16,7 +16,7 @@ class Watcher:
         if ('path' in kwargs):
             self.path = os.path.abspath(kwargs['path'])
         else:
-            self.path = os.path.abspath(".")
+            self.path = os.getcwd()
 
         if 'recursive' in kwargs:
             self.recursive = kwargs[recursive]
@@ -34,19 +34,12 @@ class Watcher:
                 time.sleep(5)
         except KeyboardInterrupt:
             self.observer.stop()
-            print("Error")
         self.observer.join()
 
 
 class Handler(FileSystemEventHandler):
     def on_created(self,event):
-        if(event.is_directory):
-            print("Folder: ",event.src_path, "was created.")
-        else: print("File: ",event.src_path, "was created.")
-    def on_modified(self,event):
-        if(event.is_directory):
-            print("Folder: ",event.src_path, "was modified.")
-        else: print("File: ",event.src_path, "was modified.")
+        subprocess.call(["markForRemoval.py", "-p", event.src_path])
 
 
 def getArgs():
