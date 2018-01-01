@@ -5,6 +5,7 @@
 import os
 import argparse
 import time
+import subprocess
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -16,17 +17,16 @@ class Watcher:
         if ('path' in kwargs):
             self.path = os.path.abspath(kwargs['path'])
         else:
-            self.path = os.path.abspath(".")
+            self.path = os.getcwd()
 
         if 'recursive' in kwargs:
-            self.recursive = kwargs[recursive]
+            self.recursive = kwargs['recursive']
         else:
             self.recursive = False
 
 
     def run(self):
         eventHandler = Handler()
-        print(self.path)
         self.observer.schedule(eventHandler,self.path,recursive=self.recursive)
         self.observer.start()
         try:
@@ -34,13 +34,13 @@ class Watcher:
                 time.sleep(5)
         except KeyboardInterrupt:
             self.observer.stop()
-            print("Error")
         self.observer.join()
 
 
 class Handler(FileSystemEventHandler):
     def on_created(self,event):
         if(event.is_directory):
+            subprocess.call("./test.py")
             print("Folder: ",event.src_path, "was created.")
         else: print("File: ",event.src_path, "was created.")
     def on_modified(self,event):
@@ -64,7 +64,8 @@ def monitor():
         watcher = Watcher(path=args.path)
     elif not args.path and args.recursive:
         watcher = Watcher(recursive=args.recursive)
-    else:
+    elif args.path is None:
+        print("non-argument watcher")
         watcher = Watcher()
     watcher.run()
 
