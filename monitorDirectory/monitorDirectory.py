@@ -45,7 +45,7 @@ class Handler(FileSystemEventHandler):
 def getArgs():
     parse = argparse.ArgumentParser()
     parse.add_argument("-p", "--path", help="The absolute path to the the directory to observe")
-    parse.add_argument("-r", "--recursive", help="Observe / Watch the directory recursively to include subdirectories")
+    parse.add_argument("-r", "--recursive", help="Observe / Watch the directory recursively to include subdirectories", action="store_true")
     args = parse.parse_args()
     return args
 
