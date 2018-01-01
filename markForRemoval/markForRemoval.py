@@ -7,22 +7,38 @@ import os
 import argparse
 import sys
 
+
 def getArgs():
     parse = argparse.ArgumentParser()
     parse.add_argument("-m", "--method", help="the name of the task to perform: 'mark' to label the items to be deleted or remove the \
         label that was set previously", choices=["mark","unmark"])
     parse.add_argument("-p","--path",help="The path to the root directory of the tree to rename the files and folders from")
-    parse.add_argument("-v","--verbose", help="Forces the script to print its current activity",action="store_true")
+    parse.add_argument("-v","--verbose", help="Forces the script to print its current activity",action="count", default=0)
     args = parse.parse_args()
+    if args.path:
+        args.path = getRealPath(args.path)
     return args
 
+def getRealPath(path):
+    if path.startswith('~'):
+        newPath = os.path.realpath(os.path.expanduser(path))
+    elif path.startswith('.'):
+        newPath = os.path.abspath(os.path.realpath(path))
+    else: newPath = os.path.realpath(path)
+
+    assert os.path.exists(newPath), "Path '{}' is invalid.".format(path)
+    return newPath
+
 relevantFolders = ["Desktop","Downloads", ".Trash"]
+protectedFileTypes = ["py"]
 allFiles = []
 allFolders = []
 args = getArgs()
 
 def main():
     method = args.method
+    if args.path is not None:
+        args.path = os.path.abspath(args.path)
     if method == "mark" or method is None:
         if args.path is None:
             markForRemoval()
@@ -80,7 +96,8 @@ def walkTree(directoryPath):
                     allFolders.append(directory)
         for filename in files:
             if filename != script and not filename.startswith("keep_"):
-                if not filename.startswith("delete_") :
+                extension = filename.split('.')[1]
+                if ( (not filename.startswith("delete_")) and (extension not in protectedFileTypes) ):
                     tempName = prefix+filename
                     try:
                         os.rename(filename,tempName)
@@ -104,8 +121,6 @@ def unmark(**path):
     else:
         currentDir = os.path.dirname(os.path.realpath(__file__))
 
-    print(currentDir)
-
     for dpath, dirs, files in os.walk(currentDir, topdown=False):
         os.chdir(dpath)
         for directory in dirs:
@@ -128,5 +143,4 @@ def unmark(**path):
 
 
 if __name__ == "__main__":
-    print("running...")
     main()

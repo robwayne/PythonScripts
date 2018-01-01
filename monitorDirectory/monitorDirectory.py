@@ -1,10 +1,9 @@
 #!/usr/bin/env python3.5
 
-
-
 import os
 import argparse
 import time
+import subprocess
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -13,21 +12,39 @@ from watchdog.events import FileSystemEventHandler
 class Watcher:
     def __init__(self, **kwargs):
         self.observer = Observer()
-        if ('path' in kwargs):
-            self.path = os.path.abspath(kwargs['path'])
+        if ('paths' in kwargs):
+            self.paths = list(map(self.getRealPath,kwargs['paths']))
         else:
-            self.path = os.getcwd()
+            self.paths = [os.getcwd()]
 
         if 'recursive' in kwargs:
-            self.recursive = kwargs[recursive]
+            self.recursive = kwargs['recursive']
         else:
             self.recursive = False
 
+    def getRealPath(self, path):
+        if path.startswith('~'):
+            newPath = os.path.realpath(os.path.expanduser(path))
+        elif path.startswith('.'):
+            newPath = os.path.abspath(os.path.realpath(path))
+        else: newPath = os.path.realpath(path)
 
-    def run(self):
+        assert os.path.exists(newPath), "Path '{}' is invalid.".format(path)
+        return newPath
+
+
+
+    def begin(self):
+        for path in self.paths:
+            pid = os.fork()
+            if pid >= 0:
+                self.run(path)
+                
+
+    def run(self, path):
         eventHandler = Handler()
-        print(self.path)
-        self.observer.schedule(eventHandler,self.path,recursive=self.recursive)
+        print(self.paths)
+        self.observer.schedule(eventHandler,path,recursive=self.recursive)
         self.observer.start()
         try:
             while True:
@@ -39,27 +56,27 @@ class Watcher:
 
 class Handler(FileSystemEventHandler):
     def on_created(self,event):
-        subprocess.call(["markForRemoval.py", "-p", event.src_path])
-
+        path = os.path.dirname(event.src_path)
+        subprocess.call(["markForRemoval.py", "-p", path])
 
 def getArgs():
     parse = argparse.ArgumentParser()
-    parse.add_argument("-p", "--path", help="The absolute path to the the directory to observe")
-    parse.add_argument("-r", "--recursive", help="Observe / Watch the directory recursively to include subdirectories", action="store_true")
+    parse.add_argument("-p", "--paths", help="The absolute path(s) to the the directory(ies) to be observed.", nargs='+')
+    parse.add_argument("-r", "--recursive", help="Observe / Watch the directory recursively to include subdirectories.", action="store_true")
     args = parse.parse_args()
     return args
 
 def monitor():
     args = getArgs()
-    if args.path and args.recursive:
-        watcher = Watcher(path=args.path,recursive=args.recursive)
-    elif args.path and not args.recursive:
-        watcher = Watcher(path=args.path)
-    elif not args.path and args.recursive:
+    if args.paths and args.recursive:
+        watcher = Watcher(paths=args.paths,recursive=args.recursive)
+    elif args.paths and not args.recursive:
+        watcher = Watcher(paths=args.paths)
+    elif not args.paths and args.recursive:
         watcher = Watcher(recursive=args.recursive)
     else:
         watcher = Watcher()
-    watcher.run()
+    watcher.begin()
 
 if __name__ == "__main__":
     monitor()

@@ -12,7 +12,7 @@ def getArgs():
     args = parse.parse_args()
     return args
 
-relevantFolders = ["Desktop","Downloads", ".Trash"]
+purgeableFolders = ["Desktop","Downloads", ".Trash"]
 args = getArgs()
 successfulRemovals = {}
 failedRemovals = {}
@@ -21,6 +21,7 @@ def main():
     pathProvided = False
 
     if args.path:
+        args.path = os.path.abspath(args.path)
         pathProvided = True
         if(args.verbose >= 2):
             subprocess.call(["markForRemoval.py", "-v", "-p", args.path])
@@ -52,13 +53,13 @@ def main():
 
 
 def remove(**path):
-    topLevelDir = os.getcwd()
+    topLevelDir = os.path.dirname(os.path.realpath(__file__))
 
     if 'root' in path:
         currentDir = path['root']
         walkTree(currentDir)
     else:
-        for folder in relevantFolders:
+        for folder in purgeableFolders:
             currentDir = os.path.join(topLevelDir,folder)
             os.chdir(currentDir)
             walkTree(currentDir)
@@ -84,7 +85,7 @@ def walkTree(directoryPath):
                     print("ERROR: {} - {}".format(e.filename,e.strerror))
 
         for directory in dirs:
-            if directory not in relevantFolders and directory.startswith("delete_"):
+            if directory not in purgeableFolders and directory.startswith("delete_"):
                 if args.verbose >= 1:
                     print("removing: ",directory)
                     if(os.path.islink(directory)):
@@ -123,7 +124,19 @@ def getArgs():
     parse.add_argument("-p","--path",help="The path to the root directory of the tree to rename the files and folders from")
     parse.add_argument("-v","--verbose", help="Forces the script to print its current activity",action="count", default=0)
     args = parse.parse_args()
+    if args.path:
+        args.path = getRealPath(args.path)
     return args
+
+def getRealPath(self, path):
+    if path.startswith('~'):
+        newPath = os.path.realpath(os.path.expanduser(path))
+    elif path.startswith('.'):
+        newPath = os.path.abspath(os.path.realpath(path))
+    else: newPath = os.path.realpath(path)
+
+    assert os.path.exists(newPath), "Path '{}' is invalid.".format(path)
+    return newPath
 
 
 if __name__ == "__main__":
