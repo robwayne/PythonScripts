@@ -30,7 +30,7 @@ def getRealPath(path):
     return newPath
 
 relevantFolders = ["Desktop","Downloads", ".Trash"]
-protectedFileTypes = ["py"]
+protectedFileTypes = ["py", "sh"]
 allFiles = []
 allFolders = []
 args = getArgs()
