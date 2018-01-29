@@ -1,4 +1,5 @@
-#!/usr/bin/pythonw
+#!/Users/robudhabi/anaconda/bin/python3.5
+#inspiration from https://www.michaelcho.me/article/using-pythons-watchdog-to-monitor-changes-to-a-directory
 
 import os
 import argparse
