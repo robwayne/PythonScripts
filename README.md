@@ -23,7 +23,7 @@ Removes the files on my computer that are located in certain directories. This w
  **Usage:**		
  
  > 1. To run ***without*** any warnings or output:
-- `$ purge.py`
+	- `$ purge.py`
 
  > 2. To run with ***limited*** output, output from purge.py itself only: 
 	 - `$ purge.py -v` 
@@ -42,7 +42,7 @@ A complementing script that works with `purge.py`. Renames files and folders tha
  **Usage:**		
  
  > 1. To run ***without*** any warnings or output:
-- `$ markForRemoval.py`
+	- `$ markForRemoval.py`
  
 > 2. To view ***all*** of the script's activity:
 	 - `$ markForRemoval.py -v`
@@ -59,7 +59,7 @@ A script that is run by the scheduleDiskCheck.sh bash script at 11:59 PM on a da
 -	Takes no arguments. 
 
 **Usage**:
-> `$ checkDiskSpace.py`
+	> `$ checkDiskSpace.py`
    
 
 > Written with [StackEdit](https://stackedit.io/).
