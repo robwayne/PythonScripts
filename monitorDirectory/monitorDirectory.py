@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.5
+#!/usr/bin/pythonw
 
 import os
 import argparse

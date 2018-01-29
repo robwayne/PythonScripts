@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.5
+#!/usr/bin/pythonw
 
 #Author: Robert Gordon
 #Date: Jan 2, 2018

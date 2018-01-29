@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.5
+#!/usr/bin/pythonw
 
 ''' A script to work in tandem with purge.py. Renames all the files in certain directories to either
         "delete_<file/folder_name>" or "keep_<file_name>" '''
