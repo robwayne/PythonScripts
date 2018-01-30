@@ -63,4 +63,4 @@ A script that is run by the scheduleDiskCheck.sh bash script at 11:59 PM on a da
 - > `$ checkDiskSpace.py`
    
 ----------
-> Written with [StackEdit](https://stackedit.io/).
+Written with [StackEdit](https://stackedit.io/).
