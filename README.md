@@ -11,6 +11,7 @@ These scripts are written in python3.5 and are a bit machine specific i.e. work 
 
 > **N.B.**
 	Assumes root directory of all these scripts have been _**exported to PATH**_.
+	**All python** files are written in _**python3.5**_
 
 
 ----------
