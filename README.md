@@ -10,7 +10,7 @@ Learning while making something useful.
 These scripts are written in python3.5 and are a bit machine specific i.e. work based on the layout of my folders and files.  
 
 > **N.B.**
-	Assumes containing directory of all these scripts have been _**exported to the PATH**_.
+	Assumes root directory of all these scripts have been _**exported to PATH**_.
 
 
 ----------
