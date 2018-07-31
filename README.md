@@ -25,7 +25,7 @@ Removes the files on my computer that are located in certain directories. This w
  > 1. To run ***without*** any warnings or output:
 	- `$ purge.py`
 
- > 2. To run with ***limited*** output, output from purge.py itself only: 
+ > 2. To run with ***limited*** output (only the output that the script itself generates): 
 	 - `$ purge.py -v` 
  
 > 3. To view ***all*** of the script's activity as well as the verbose output of `markForRemoval.py`: 
