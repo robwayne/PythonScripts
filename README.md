@@ -7,11 +7,10 @@ Learning while making something useful.
 
 ----------
 
-These scripts are written in python3.5 and are a bit machine specific i.e. work based on the layout of my folders and files.  
+These scripts are written in **_python3.5_** and are a bit machine specific i.e. work based on the layout of my folders and files.  
 
 > **N.B.**
 	- Assumes root directory of all these scripts has been _**exported to PATH**_.
-	- **All** _python files_ are written in _**python3.5**_.
 
 
 ----------
